@@ -1,0 +1,17 @@
+# Terraform
+# Directolio local de trabajo
+terraform/.terraform/*
+terraform/.terraform.lock.hcl
+terraform/tfapply
+terraform/tfapply.txt
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+
+#Ficheros locales del callejero
+samples/
+output/
+caj_esp_072025/
