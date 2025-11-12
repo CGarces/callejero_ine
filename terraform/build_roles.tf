@@ -39,9 +39,7 @@ resource "aws_iam_policy" "CodeBuildBasePolicy" {
         },
         {
           "Effect" : "Allow",
-          "Resource" : [
-            "arn:aws:ecr:${var.region}:${data.aws_caller_identity.current.account_id}:repository/${var.project}-${var.env}/*"
-          ],
+          "Resource" : ["${aws_ecr_repository.api_repository.arn}"],
           "Action" : [
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
@@ -67,15 +65,6 @@ resource "aws_iam_policy" "CodeBuildBasePolicy" {
           ],
           "Resource" : [
             "arn:aws:codebuild:${var.region}:${data.aws_caller_identity.current.account_id}:report-group/${var.project}-${var.env}-*"
-          ]
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : [
-            "ecs:*",
-          ],
-          "Resource" : [
-            "*"
           ]
         }
       ]

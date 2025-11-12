@@ -84,7 +84,7 @@ resource "aws_cloudfront_distribution" "api" {
   origin {
     domain_name              = replace(replace(aws_lambda_function_url.api_rest.function_url, "https://", ""), "/", "")
     origin_access_control_id = aws_cloudfront_origin_access_control.oac_lambda.id
-    origin_id                = local.lambda_name
+    origin_id                = aws_lambda_function.api_rest.function_name
     custom_origin_config {
       http_port              = 80
       https_port             = 443
@@ -107,12 +107,15 @@ resource "aws_cloudfront_distribution" "api" {
       "GET",
       "HEAD",
     ]
-    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Caching optimized
+    # cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Caching optimized
+    # TODO: Modificacion temporal, no cachea para asegurar que siempre llama a la última versión de la lambda durante el desarrollo.action_trigger {
+    # De lo contrario, cada vez que se actualiza la lambda, hay que invalidar la caché de CloudFront
+    cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching disabled
     cached_methods = [
       "GET",
       "HEAD",
     ]
-    target_origin_id       = local.lambda_name
+    target_origin_id       = aws_lambda_function.api_rest.function_name
     viewer_protocol_policy = "redirect-to-https"
   }
 

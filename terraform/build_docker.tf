@@ -3,6 +3,7 @@ resource "aws_codebuild_project" "api" {
   name         = "${var.project}-${var.env}-api"
   service_role = aws_iam_role.codebuild-service-role.arn
   source {
+    buildspec           = "api_rest/buildspec.yml"
     type                = "GITHUB"
     location            = "https://github.com/CGarces/callejero_ine"
     report_build_status = true
@@ -12,7 +13,7 @@ resource "aws_codebuild_project" "api" {
     }
     auth {
       type     = "CODECONNECTIONS"
-      resource = "arn:aws:codeconnections:eu-west-1:${data.aws_caller_identity.current.account_id}:connection/bdeff464-af64-4c76-a2eb-b52808ffc3c1"
+      resource = "arn:aws:codeconnections:${var.region}:${data.aws_caller_identity.current.account_id}:connection/bdeff464-af64-4c76-a2eb-b52808ffc3c1"
     }
   }
   artifacts {
@@ -24,10 +25,14 @@ resource "aws_codebuild_project" "api" {
     image                       = "aws/codebuild/amazonlinux-x86_64-standard:5.0"
     privileged_mode             = true
     image_pull_credentials_type = "CODEBUILD"
-  }
-
-  lifecycle {
-    ignore_changes = all
+    environment_variable {
+      name  = "IMAGE_REPO_NAME"
+      value = aws_ecr_repository.api_repository.name
+    }
+    environment_variable {
+      name  = "ACCOUNT_ID"
+      value = data.aws_caller_identity.current.account_id
+    }
   }
 }
 
@@ -44,8 +49,5 @@ resource "aws_codebuild_webhook" "api" {
       type    = "HEAD_REF"
       pattern = "^refs/heads/main$"
     }
-  }
-  lifecycle {
-    ignore_changes = all
   }
 }
