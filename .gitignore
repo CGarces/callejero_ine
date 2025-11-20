@@ -4,6 +4,7 @@ terraform/.terraform/*
 terraform/.terraform.lock.hcl
 terraform/tfapply
 terraform/tfapply.txt
+terraform/api_rest.zip
 # Python
 __pycache__/
 *.pyc
