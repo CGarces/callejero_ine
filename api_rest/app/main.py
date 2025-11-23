@@ -4,7 +4,7 @@ import duckdb
 
 app = FastAPI()
 start = time.time()
-con = duckdb.connect("tram.duckdb")
+con = duckdb.connect("tram.duckdb", config={"access_mode": "READ_ONLY"})
 end = time.time()
 print(f"Loaded TRAM table in {end - start:.2f} seconds")
 
