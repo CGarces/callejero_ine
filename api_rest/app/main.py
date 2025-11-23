@@ -1,10 +1,12 @@
+import time
 from fastapi import FastAPI, HTTPException, status, Response
 import duckdb
 
 app = FastAPI()
-con = duckdb.connect(":memory:")
-con.execute("CREATE TABLE TRAM AS SELECT * FROM read_parquet('./output/TRAM.parquet')")
-# con.execute("CREATE TABLE UP AS SELECT * FROM read_parquet('./output/UP.parquet')")
+start = time.time()
+con = duckdb.connect("tram.duckdb")
+end = time.time()
+print(f"Loaded TRAM table in {end - start:.2f} seconds")
 
 
 @app.get(
