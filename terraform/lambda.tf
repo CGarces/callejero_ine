@@ -28,6 +28,13 @@ resource "aws_lambda_function" "api_rest" {
   timeout     = 30
   memory_size = 1024
   publish     = true
+
+  environment {
+    variables = {
+      "AWS_LWA_ASYNC_INIT" = "true"
+    }
+  }
+
 }
 
 resource "aws_lambda_permission" "api_rest_cf" {
