@@ -11,9 +11,11 @@ Dependencias: pandas, pyarrow
 """
 import argparse
 import pathlib
+import os
 from typing import Iterable, List, Dict, Tuple
 
 import pandas as pd
+import duckdb
 
 FieldSpec = Tuple[str, int, int, str]
 
@@ -265,6 +267,12 @@ def main():
     output_dir = args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    con = duckdb.connect()
+    # Elimina el fichero de base de datos previo
+    if os.path.exists("callejero.duckdb"):
+        os.remove("callejero.duckdb")
+    con.execute("ATTACH 'callejero.duckdb'")
+
     for stem, func in PARSERS.items():
         files = sorted(input_dir.glob(f"{stem}*.*"))
         if not files:
@@ -276,6 +284,11 @@ def main():
         out_path = output_dir / f"{path.stem}.parquet"
         df.to_parquet(out_path, index=False, engine="pyarrow", compression="gzip")
         print(f"[OK] {out_path} ({len(df)} filas)")
+        # Carga en DuckDB
+        con.execute(f"CREATE TABLE {stem} AS SELECT * FROM read_parquet('{out_path}')")
+
+    con.execute("COPY FROM DATABASE memory TO callejero")
+    con.execute("DETACH callejero")
 
 
 if __name__ == "__main__":
