@@ -82,6 +82,13 @@ resource "aws_cloudfront_distribution" "api" {
   # aliases = [var.env == "pro" ?   :  ]
   comment = "CDN API ${var.project} ${var.env}"
   origin {
+    domain_name              = "callejero-ficheros.s3.eu-west-1.amazonaws.com"
+    origin_access_control_id = aws_cloudfront_origin_access_control.oac_s3.id
+    origin_id                = "callejero-ficheros.s3.eu-west-1.amazonaws.com"
+    origin_path              = "/public"
+  }
+
+  origin {
     domain_name              = replace(replace(aws_lambda_function_url.api_rest.function_url, "https://", ""), "/", "")
     origin_access_control_id = aws_cloudfront_origin_access_control.oac_lambda.id
     origin_id                = aws_lambda_function.api_rest.function_name
@@ -117,6 +124,27 @@ resource "aws_cloudfront_distribution" "api" {
     ]
     target_origin_id       = aws_lambda_function.api_rest.function_name
     viewer_protocol_policy = "redirect-to-https"
+  }
+
+  ordered_cache_behavior {
+    allowed_methods = [
+      "GET",
+      "HEAD",
+    ]
+    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+    compress               = true
+    default_ttl            = 0
+    max_ttl                = 0
+    min_ttl                = 0
+    path_pattern           = "favicon.ico"
+    smooth_streaming       = false
+    target_origin_id       = "callejero-ficheros.s3.eu-west-1.amazonaws.com"
+    viewer_protocol_policy = "redirect-to-https"
+
   }
 
   restrictions {
