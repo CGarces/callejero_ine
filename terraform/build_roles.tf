@@ -66,7 +66,14 @@ resource "aws_iam_policy" "CodeBuildBasePolicy" {
           "Resource" : [
             "arn:aws:codebuild:${var.region}:${data.aws_caller_identity.current.account_id}:report-group/${var.project}-${var.env}-*"
           ]
-        }
+        },
+        {
+          Action = [
+            "lambda:UpdateFunctionCode",
+          ]
+          Effect   = "Allow"
+          Resource = [aws_lambda_function.api_rest.arn]
+        },
       ]
     }
   )

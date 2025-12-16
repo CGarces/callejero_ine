@@ -11,14 +11,15 @@ resource "aws_ecr_repository_policy" "api_repository" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "LambdaECRImageRetrievalPolicy"
-        Effect   = "Allow"
+        Sid    = "LambdaECRImageRetrievalPolicy"
+        Effect = "Allow"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
         Action = [
           "ecr:BatchGetImage",
-          "ecr:GetDownloadUrlForLayer"
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetRepositoryPolicy"
         ]
       }
     ]
