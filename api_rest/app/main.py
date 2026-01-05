@@ -59,7 +59,7 @@ def get_localidades_by_cp(cpos: str):
 
 @app.get(
     "/cp/{cpos}/{nviac}",
-    summary="Busqueda por codigo postal y coincidencia parcial",
+    summary="Busqueda de calles por codigo postal y coincidencia parcial",
     responses={
         200: {
             "description": "Listado de calles para un codigo postal y una coincidencia parcial"
@@ -107,10 +107,10 @@ def get_via_by_cpos(cpos: int, nviac: str):
 
 @app.get(
     "/{cpro}/{cmun}/{cun}/{nviac}",
-    summary="Codigos postales por unidad poblacional",
+    summary="Busqueda de calles por por unidad poblacional y una coincidencia parcial",
     responses={
         200: {
-            "description": "Listado de codigos postales para la provincia/municipio/unidad poblacional"
+            "description": "Listado de calles para la provincia/municipio/unidad poblacional y una coincidencia parcial"
         },
         404: {
             "description": "Sin resultados para la provincia/municipio/unidad poblacional"
@@ -225,9 +225,3 @@ def get_by_cun(cpro: int, cmun: int, cun: int):
         )
 
     return items
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8000)
