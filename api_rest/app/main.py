@@ -58,7 +58,7 @@ def get_localidades_by_cp(cpos: str):
 
 
 @app.get(
-    "/cp/{cpos}/{nviac}",
+    "/vias/{cpos}/{nviac}",
     summary="Busqueda de calles por codigo postal y coincidencia parcial",
     responses={
         200: {
@@ -106,7 +106,7 @@ def get_via_by_cpos(cpos: int, nviac: str):
 
 
 @app.get(
-    "/{cpro}/{cmun}/{cun}/{nviac}",
+    "/vias/{cpro}/{cmun}/{cun}/{nviac}",
     summary="Busqueda de calles por por unidad poblacional y una coincidencia parcial",
     responses={
         200: {
@@ -190,7 +190,7 @@ def get_localidades_by_cpro_cnum(cpro: int, cmun: int):
 
 
 @app.get(
-    "/{cpro}/{cmun}/{cun}",
+    "/cp/{cpro}/{cmun}/{cun}",
     summary="Codigos postales por unidad poblacional",
     responses={
         200: {
@@ -202,7 +202,7 @@ def get_localidades_by_cpro_cnum(cpro: int, cmun: int):
     },
 )
 def get_by_cun(cpro: int, cmun: int, cun: int):
-    """Devuelve el codigo de provincia, municipio, unidad poblacional y descripcion de una unidad poblacional."""
+    """Devuelve el codigo postal, provincia, municipio, unidad poblacional y descripcion de una unidad poblacional."""
 
     cur = con.execute(
         """
