@@ -15,7 +15,7 @@ phases:
       - echo Construyendo Imagen Docker...
       - cd api_rest
       # Descarga de la base de datos de DuckDB desde S3
-      - aws s3 cp s3://callejero-ficheros/tram.duckdb ./app/tram.duckdb
+      - aws s3 cp s3://callejero-ficheros/callejero.duckdb ./app/callejero.duckdb
       - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - echo Subiendo inagen a ECR...
