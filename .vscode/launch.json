@@ -18,11 +18,13 @@
             "jinja": false
         },
         {
-            "name": "ng serve",
+            "name": "Debug Angular in Chrome",
             "type": "chrome",
             "request": "launch",
-            "preLaunchTask": "npm: start",
-            "url": "http://localhost:4200/"
+            "url": "http://localhost:4200/",
+            "webRoot": "${workspaceFolder}/frontend-demo",
+            "sourceMaps": true,
+            "trace": true
         },
         {
             "name": "ng test",
