@@ -2,7 +2,7 @@ import time
 from fastapi import FastAPI, HTTPException, status, Response
 import duckdb
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 start = time.time()
 con = duckdb.connect("callejero.duckdb", config={"access_mode": "READ_ONLY"})
 end = time.time()
