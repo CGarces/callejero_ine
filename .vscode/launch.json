@@ -11,6 +11,8 @@
             "module": "uvicorn",
             "args": [
                 "api_rest.app.main:app",
+                "--reload-dir",
+                "api_rest/app",
                 "--reload"
             ],
             "jinja": false
