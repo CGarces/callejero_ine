@@ -148,16 +148,48 @@ def get_provincias_by_ccom(ccom: int):
 
 
 @app.get(
-    "/cp/{cpos}",
-    summary="Localidades por código postal",
+    "/poblaciones/{cpro}",
+    summary="Listado de poblaciones de una provincia con su codigo y nombre",
     responses={
-        200: {"description": "Listado de localidades para el CP"},
-        204: {"description": "Sin contenido: el CP parcial tiene menos de 3 dígitos"},
-        400: {"description": "Petición inválida: el CP no es numérico"},
-        404: {"description": "No se encontraron localidades para el CP"},
+        200: {"description": "Listado de poblaciones para la provincia"},
+        404: {"description": "No se encontraron poblaciones para la provincia"},
     },
 )
-def get_localidades_by_cp(cpos: str):
+def get_poblaciones_by_cpro(cpro: int):
+    """Devuelve el listado de poblaciones de una provincia con su codigo y nombre."""
+    # TODO Eliminar el nucleo de poblacion directamente de la fuente de datos
+    cur = con.execute(
+        """
+        SELECT cmun, FLOOR(cun / 1000) AS cun, NENTSIC
+        FROM TRAM
+        WHERE cpro = ?
+        GROUP BY cmun, FLOOR(cun / 1000), NENTSIC
+        ORDER BY cmun, cun
+    """,
+        [cpro],
+    )
+
+    rows = cur.fetchall()
+    cols = [desc[0] for desc in cur.description]
+    items = [dict(zip(cols, r)) for r in rows]
+
+    if not items:
+        raise HTTPException(status_code=404, detail="Sin resultados para esa provincia")
+
+    return items
+
+
+@app.get(
+    "/cp/{cpos}",
+    summary="poblaciones por código postal",
+    responses={
+        200: {"description": "Listado de poblaciones para el CP"},
+        204: {"description": "Sin contenido: el CP parcial tiene menos de 3 dígitos"},
+        400: {"description": "Petición inválida: el CP no es numérico"},
+        404: {"description": "No se encontraron poblaciones para el CP"},
+    },
+)
+def get_poblaciones_by_cp(cpos: str):
     """
     Devuelve el codigo de provincia, municipio y descripcion para un codigo postal (cpos).
     Permite busquedas parciales con un minimo de 3 caracteres
@@ -170,20 +202,20 @@ def get_localidades_by_cp(cpos: str):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     sql = """
-        SELECT cpos, cpro, cmun,  NENTSIC
+        SELECT cpos, cpro, cmun, FLOOR(cun / 1000), NENTSIC
         FROM TRAM
     """
 
     cur = None
     if len(cpos) == 5:
-        sql += "WHERE cpos = ?  GROUP BY cpos, cpro, cmun,  NENTSIC "
+        sql += "WHERE cpos = ?  GROUP BY cpos, cpro, cmun, FLOOR(cun / 1000), NENTSIC "
         cur = con.execute(sql, [int(cpos)])
     else:
         # Se completa con valores a la derecha para busquedas parciales, respetando los ceros a la izquierda
         cpos_min = int(cpos.ljust(5, "0"))
         cpos_max = int(cpos.ljust(5, "9"))
 
-        sql += "WHERE cpos BETWEEN ? and ? GROUP BY cpos, cpro, cmun, NENTSIC"
+        sql += "WHERE cpos BETWEEN ? and ? GROUP BY cpos, cpro, cmun, FLOOR(cun / 1000), NENTSIC"
         cur = con.execute(sql, [cpos_min, cpos_max])
 
     rows = cur.fetchall()
@@ -220,7 +252,7 @@ def get_via_by_cpos(cpos: int, nviac: str):
         FROM TRAM
         INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia = VIAS.cvia
         WHERE cpos = ? and TRAM.nviac LIKE ?
-        GROUP BY cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia,  NENTSIC, TVIA, NVIA
+        GROUP BY cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, NVIA
     """,
         [cpos, f"%{nviac.upper()}%"],
     )
