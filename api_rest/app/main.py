@@ -1,5 +1,5 @@
 import time
-from fastapi import FastAPI, HTTPException, status, Response
+from fastapi import FastAPI, HTTPException, status, Response, Path
 import duckdb
 
 app = FastAPI(root_path="/api")
@@ -9,43 +9,43 @@ end = time.time()
 print(f"Loaded TRAM table in {end - start:.2f} seconds")
 
 dict_auto = {
-    "01": "ANDALUCIA",
-    "02": "ARAGON",
+    "01": "ANDALUCÍA",
+    "02": "ARAGÓN",
     "03": "ASTURIAS",
     "04": "BALEARES",
     "05": "CANARIAS",
     "06": "CANTABRIA",
-    "07": "CASTILLA Y LEON",
-    "08": "CASTILLA LA MANCHA",
-    "09": "CATALUNA",
+    "07": "CASTILLA Y LEÓN",
+    "08": "CASTILLA-LA MANCHA",
+    "09": "CATALUÑA",
     "10": "COMUNITAT VALENCIANA",
     "11": "EXTREMADURA",
     "12": "GALICIA",
     "13": "MADRID",
     "14": "MURCIA",
     "15": "NAVARRA",
-    "16": "PAIS VASCO",
-    "17": "RIOJA, LA",
+    "16": "PAÍS VASCO",
+    "17": "LA RIOJA",
     "18": "CEUTA",
     "19": "MELILLA",
 }
 
 dict_provincia = {
-    "01": {"PRO": "ALAVA", "CCOM": "16"},
+    "01": {"PRO": "ÁLAVA", "CCOM": "16"},
     "02": {"PRO": "ALBACETE", "CCOM": "08"},
     "03": {"PRO": "ALICANTE/ALACANT", "CCOM": "10"},
-    "04": {"PRO": "ALMERIA", "CCOM": "01"},
-    "05": {"PRO": "AVILA", "CCOM": "07"},
+    "04": {"PRO": "ALMERÍA", "CCOM": "01"},
+    "05": {"PRO": "ÁVILA", "CCOM": "07"},
     "06": {"PRO": "BADAJOZ", "CCOM": "11"},
-    "07": {"PRO": "BALEARS, ILLES", "CCOM": "04"},
+    "07": {"PRO": "ILLES BALEARS", "CCOM": "04"},
     "08": {"PRO": "BARCELONA", "CCOM": "09"},
     "09": {"PRO": "BURGOS", "CCOM": "07"},
-    "10": {"PRO": "CACERES", "CCOM": "11"},
-    "11": {"PRO": "CADIZ", "CCOM": "01"},
-    "12": {"PRO": "CASTELLON/CASTELLO", "CCOM": "10"},
+    "10": {"PRO": "CÁCERES", "CCOM": "11"},
+    "11": {"PRO": "CÁDIZ", "CCOM": "01"},
+    "12": {"PRO": "CASTELLÓN/CASTELLÓ", "CCOM": "10"},
     "13": {"PRO": "CIUDAD REAL", "CCOM": "08"},
-    "14": {"PRO": "CORDOBA", "CCOM": "01"},
-    "15": {"PRO": "CORUNA, A", "CCOM": "12"},
+    "14": {"PRO": "CÓRDOBA", "CCOM": "01"},
+    "15": {"PRO": "A CORUÑA", "CCOM": "12"},
     "16": {"PRO": "CUENCA", "CCOM": "08"},
     "17": {"PRO": "GIRONA", "CCOM": "09"},
     "18": {"PRO": "GRANADA", "CCOM": "01"},
@@ -53,19 +53,19 @@ dict_provincia = {
     "20": {"PRO": "GIPUZKOA", "CCOM": "16"},
     "21": {"PRO": "HUELVA", "CCOM": "01"},
     "22": {"PRO": "HUESCA", "CCOM": "02"},
-    "23": {"PRO": "JAEN", "CCOM": "01"},
-    "24": {"PRO": "LEON", "CCOM": "07"},
+    "23": {"PRO": "JAÉN", "CCOM": "01"},
+    "24": {"PRO": "LEÓN", "CCOM": "07"},
     "25": {"PRO": "LLEIDA", "CCOM": "09"},
-    "26": {"PRO": "RIOJA, LA", "CCOM": "17"},
+    "26": {"PRO": "LA RIOJA", "CCOM": "17"},
     "27": {"PRO": "LUGO", "CCOM": "12"},
     "28": {"PRO": "MADRID", "CCOM": "13"},
-    "29": {"PRO": "MALAGA", "CCOM": "01"},
+    "29": {"PRO": "MÁLAGA", "CCOM": "01"},
     "30": {"PRO": "MURCIA", "CCOM": "14"},
     "31": {"PRO": "NAVARRA", "CCOM": "15"},
     "32": {"PRO": "OURENSE", "CCOM": "12"},
     "33": {"PRO": "ASTURIAS", "CCOM": "03"},
     "34": {"PRO": "PALENCIA", "CCOM": "07"},
-    "35": {"PRO": "PALMAS, LAS", "CCOM": "05"},
+    "35": {"PRO": "LAS PALMAS", "CCOM": "05"},
     "36": {"PRO": "PONTEVEDRA", "CCOM": "12"},
     "37": {"PRO": "SALAMANCA", "CCOM": "07"},
     "38": {"PRO": "SANTA CRUZ DE TENERIFE", "CCOM": "05"},
@@ -76,7 +76,7 @@ dict_provincia = {
     "43": {"PRO": "TARRAGONA", "CCOM": "09"},
     "44": {"PRO": "TERUEL", "CCOM": "02"},
     "45": {"PRO": "TOLEDO", "CCOM": "08"},
-    "46": {"PRO": "VALENCIA/VALENCIA", "CCOM": "10"},
+    "46": {"PRO": "VALENCIA/VALÈNCIA", "CCOM": "10"},
     "47": {"PRO": "VALLADOLID", "CCOM": "07"},
     "48": {"PRO": "BIZKAIA", "CCOM": "16"},
     "49": {"PRO": "ZAMORA", "CCOM": "07"},
@@ -88,13 +88,13 @@ dict_provincia = {
 
 @app.get(
     "/autonomias/",
-    summary="Listado de todas las comunidades autonomas",
+    summary="Listado de todas las comunidades autónomas",
     responses={
-        200: {"description": "Listado de autonomias"},
+        200: {"description": "Listado de autonomías"},
     },
 )
 def get_autonomias():
-    """Devuelve el listado de comunidades autonomas con su codigo y nombre."""
+    """Devuelve el listado de comunidades autónomas con su código y nombre."""
     items = [{"CCOM": code, "AUTO": name} for code, name in dict_auto.items()]
     return items
 
@@ -104,11 +104,11 @@ def get_autonomias():
     summary="Listado de todas las provincias",
     responses={
         200: {"description": "Listado de provincias"},
-        404: {"description": "No se encontro la comunidad autonoma"},
+        404: {"description": "No se encontró la comunidad autónoma"},
     },
 )
 def get_provincias():
-    """Devuelve el listado de provincias con su codigo, nombre y comunidad autonoma."""
+    """Devuelve el listado de provincias con su código, nombre y comunidad autónoma."""
     items = [
         {
             "CODPRO": code,
@@ -120,20 +120,24 @@ def get_provincias():
     ]
     if len(items) == 0:
         raise HTTPException(
-            status_code=404, detail="Sin resultados para esa comunidad autonoma"
+            status_code=404, detail="Sin resultados para esa comunidad autónoma"
         )
     return items
 
 
 @app.get(
     "/provincias/{ccom}",
-    summary="Listado de todas las provincias de una comunidad autonoma",
+    summary="Listado de todas las provincias de una comunidad autónoma",
     responses={
         200: {"description": "Listado de provincias"},
     },
 )
-def get_provincias_by_ccom(ccom: int):
-    """Devuelve el listado de provincias de una comunidad autonom con su codigo, nombre y comunidad autonoma."""
+def get_provincias_by_ccom(
+    ccom: int = Path(
+        ..., description="Código de comunidad autónoma (01-19)", ge=1, le=19
+    )
+):
+    """Devuelve el listado de provincias de una comunidad autónoma con su código, nombre y comunidad autónoma."""
     items = [
         {
             "CODPRO": code,
@@ -149,14 +153,16 @@ def get_provincias_by_ccom(ccom: int):
 
 @app.get(
     "/poblaciones/{cpro}",
-    summary="Listado de poblaciones de una provincia con su codigo y nombre",
+    summary="Listado de poblaciones de una provincia con su código y nombre",
     responses={
         200: {"description": "Listado de poblaciones para la provincia"},
         404: {"description": "No se encontraron poblaciones para la provincia"},
     },
 )
-def get_poblaciones_by_cpro(cpro: int):
-    """Devuelve el listado de poblaciones de una provincia con su codigo y nombre."""
+def get_poblaciones_by_cpro(
+    cpro: int = Path(..., description="Código de provincia (01-52)", ge=1, le=52)
+):
+    """Devuelve el listado de poblaciones de una provincia con su código y nombre."""
     # TODO Eliminar el nucleo de poblacion directamente de la fuente de datos
     cur = con.execute(
         """
@@ -181,7 +187,7 @@ def get_poblaciones_by_cpro(cpro: int):
 
 @app.get(
     "/cp/{cpos}",
-    summary="poblaciones por código postal",
+    summary="Poblaciones por código postal",
     responses={
         200: {"description": "Listado de poblaciones para el CP"},
         204: {"description": "Sin contenido: el CP parcial tiene menos de 3 dígitos"},
@@ -189,12 +195,19 @@ def get_poblaciones_by_cpro(cpro: int):
         404: {"description": "No se encontraron poblaciones para el CP"},
     },
 )
-def get_poblaciones_by_cp(cpos: str):
+def get_poblaciones_by_cp(
+    cpos: str = Path(
+        ...,
+        description="Código postal completo (5 dígitos) o parcial (mínimo 3 dígitos)",
+        min_length=3,
+        max_length=5,
+    )
+):
     """
-    Devuelve el codigo de provincia, municipio y descripcion para un codigo postal (cpos).
-    Permite busquedas parciales con un minimo de 3 caracteres
+    Devuelve el código de provincia, municipio y descripción para un código postal (cpos).
+    Permite búsquedas parciales con un mínimo de 3 caracteres
     """
-    # El cp se envia intencianadamente como str para mantener los ceros a la izquierda
+    # El cp se envia intencionadamente como str para mantener los ceros a la izquierda
     if not cpos.isdigit():
         raise HTTPException(status_code=400, detail="cpos debe ser numérico")
 
@@ -230,18 +243,21 @@ def get_poblaciones_by_cp(cpos: str):
 
 @app.get(
     "/vias/{cpos}/{nviac}",
-    summary="Busqueda de calles por codigo postal y coincidencia parcial",
+    summary="Búsqueda de calles por código postal y coincidencia parcial",
     responses={
         200: {
-            "description": "Listado de calles para un codigo postal y una coincidencia parcial"
+            "description": "Listado de calles para un código postal y una coincidencia parcial"
         },
-        404: {
-            "description": "Sin resultados para la el codigo postal y el texto parcial"
-        },
+        404: {"description": "Sin resultados para el código postal y el texto parcial"},
     },
 )
-def get_via_by_cpos(cpos: int, nviac: str):
-    """Devuelve el nombre de la via en funcion del codigo postal y una coincidencia parcial."""
+def get_via_by_cpos(
+    cpos: int = Path(..., description="Código postal (5 dígitos)", ge=1000, le=99999),
+    nviac: str = Path(
+        ..., description="Nombre parcial de la vía (mínimo 3 caracteres)", min_length=3
+    ),
+):
+    """Devuelve el nombre de la vía en función del código postal y una coincidencia parcial."""
 
     if len(nviac) < 3:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -278,7 +294,7 @@ def get_via_by_cpos(cpos: int, nviac: str):
 
 @app.get(
     "/vias/{cpro}/{cmun}/{cun}/{nviac}",
-    summary="Busqueda de calles por por unidad poblacional y una coincidencia parcial",
+    summary="Búsqueda de calles por unidad poblacional y una coincidencia parcial",
     responses={
         200: {
             "description": "Listado de calles para la provincia/municipio/unidad poblacional y una coincidencia parcial"
@@ -288,8 +304,15 @@ def get_via_by_cpos(cpos: int, nviac: str):
         },
     },
 )
-def get_via_by_cun(cpro: int, cmun: int, cun: int, nviac: str):
-    """Devuelve el nombre de la via en funcion del la unidad poblacional y una coincidencia parcial."""
+def get_via_by_cun(
+    cpro: int = Path(..., description="Código de provincia (01-52)", ge=1, le=52),
+    cmun: int = Path(..., description="Código de municipio", ge=1),
+    cun: int = Path(..., description="Código de unidad poblacional", ge=0),
+    nviac: str = Path(
+        ..., description="Nombre parcial de la vía (mínimo 3 caracteres)", min_length=3
+    ),
+):
+    """Devuelve el nombre de la vía en función de la unidad poblacional y una coincidencia parcial."""
 
     if len(nviac) < 3:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -328,15 +351,18 @@ def get_via_by_cun(cpro: int, cmun: int, cun: int, nviac: str):
 
 @app.get(
     "/{cpro}/{cmun}",
-    summary="Codigos postales por provincia y municipio",
+    summary="Códigos postales por provincia y municipio",
     responses={
-        200: {"description": "Listado de codigos postales para la provincia/municipio"},
+        200: {"description": "Listado de códigos postales para la provincia/municipio"},
         404: {"description": "Sin resultados para la provincia/municipio"},
     },
 )
-def get_localidades_by_cpro_cnum(cpro: int, cmun: int):
+def get_localidades_by_cpro_cnum(
+    cpro: int = Path(..., description="Código de provincia (01-52)", ge=1, le=52),
+    cmun: int = Path(..., description="Código de municipio", ge=1),
+):
     """
-    Devuelve el codigo de provincia, municipio y descripcion para un codigo codigo de provincia y municipo.
+    Devuelve el código de provincia, municipio y descripción para un código de provincia y municipio.
     """
     cur = con.execute(
         """
@@ -362,18 +388,22 @@ def get_localidades_by_cpro_cnum(cpro: int, cmun: int):
 
 @app.get(
     "/cp/{cpro}/{cmun}/{cun}",
-    summary="Codigos postales por unidad poblacional",
+    summary="Códigos postales por unidad poblacional",
     responses={
         200: {
-            "description": "Listado de codigos postales para la provincia/municipio/unidad poblacional"
+            "description": "Listado de códigos postales para la provincia/municipio/unidad poblacional"
         },
         404: {
             "description": "Sin resultados para la provincia/municipio/unidad poblacional"
         },
     },
 )
-def get_by_cun(cpro: int, cmun: int, cun: int):
-    """Devuelve el codigo postal, provincia, municipio, unidad poblacional y descripcion de una unidad poblacional."""
+def get_by_cun(
+    cpro: int = Path(..., description="Código de provincia (01-52)", ge=1, le=52),
+    cmun: int = Path(..., description="Código de municipio", ge=1),
+    cun: int = Path(..., description="Código de unidad poblacional", ge=0),
+):
+    """Devuelve el código postal, provincia, municipio, unidad poblacional y descripción de una unidad poblacional."""
 
     cur = con.execute(
         """
