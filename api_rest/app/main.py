@@ -264,11 +264,11 @@ def get_via_by_cpos(
 
     cur = con.execute(
         """
-        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, NVIA
+        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, TRAM.nviac
         FROM TRAM
         INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia = VIAS.cvia
         WHERE cpos = ? and TRAM.nviac LIKE ?
-        GROUP BY cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, NVIA
+        GROUP BY cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, TRAM.nviac
     """,
         [cpos, f"%{nviac.upper()}%"],
     )
@@ -283,9 +283,9 @@ def get_via_by_cpos(
             detail="Sin resultados para la el codigo postal y el texto parcial",
         )
 
-    # Capitaliza TVIA, NVIA en la respuesta
+    # Capitaliza TVIA, NVIAC en la respuesta
     items = [
-        {**item, "tvia": item["tvia"].title(), "nvia": item["nvia"].title()}
+        {**item, "tvia": item["tvia"].title(), "nvia": item["nviac"].title()}
         for item in items
     ]
 
@@ -319,11 +319,11 @@ def get_via_by_cun(
 
     cur = con.execute(
         """
-        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun, NENTSIC, TVIA, NVIA
+        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun, NENTSIC, TVIA, TRAM.nviac
         FROM TRAM
         INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia = VIAS.cvia
         WHERE TRAM.cpro = ? and TRAM.cmun = ? and TRAM.cun = ? and TRAM.nviac LIKE ?
-        GROUP BY  cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun, NENTSIC, TVIA, NVIA
+        GROUP BY  cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun, NENTSIC, TVIA, TRAM.nviac
     """,
         [cpro, cmun, cun, f"%{nviac.upper()}%"],
     )
@@ -338,11 +338,11 @@ def get_via_by_cun(
             detail="Sin resultados para la provincia/municipio/unidad poblacional",
         )
 
-    # Capitaliza TVIA, NVIA en la respuesta
+    # Capitaliza TVIA, NVIAC en la respuesta
     # La funcion init_cap no existe en DUCKDB, y realizar SUBSTR es lijeramente mas costoso
     # TODO Reevaluar si se imeplenta https://github.com/duckdb/duckdb/discussions/12999
     items = [
-        {**item, "tvia": item["tvia"].title(), "nvia": item["nvia"].title()}
+        {**item, "tvia": item["tvia"].title(), "nvia": item["nviac"].title()}
         for item in items
     ]
 
