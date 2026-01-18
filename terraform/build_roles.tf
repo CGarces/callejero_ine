@@ -20,7 +20,9 @@ resource "aws_iam_policy" "CodeBuildBasePolicy" {
         {
           "Effect" : "Allow",
           "Resource" : [
-            "arn:aws:s3:::codepipeline-${var.region}-*"
+            "arn:aws:s3:::codepipeline-${var.region}-*",
+            aws_s3_bucket.frontend_bucket.arn,
+            "${aws_s3_bucket.frontend_bucket.arn}/*"
           ],
           "Action" : [
             "s3:PutObject",

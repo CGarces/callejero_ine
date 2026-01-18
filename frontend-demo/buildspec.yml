@@ -1,0 +1,20 @@
+version: 0.2
+env:
+  variables:
+    # IMAGE_REPO_NAME: Se pasa como variable de entorno desde la consola de CodeBuild
+    # ACCOUNT_ID: Se pasa como variable de entorno desde la consola de CodeBuild
+    IMAGE_TAG: latest
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+  pre_build:
+    commands:
+      - echo Installing dependencies...
+      - npm install -g pnpm
+      - cd frontend-demo
+      - pnpm install
+  build:
+    commands:
+      - pnpm run build
+      - aws s3 sync ./dist/frontend-demo/browser s3://$S3_BUCKET_NAME/www/
