@@ -33,6 +33,10 @@ resource "aws_codebuild_project" "api" {
       name  = "ACCOUNT_ID"
       value = data.aws_caller_identity.current.account_id
     }
+    environment_variable {
+      name  = "S3_BUCKET_NAME"
+      value = aws_s3_bucket.frontend_bucket.bucket
+    }
   }
 }
 
