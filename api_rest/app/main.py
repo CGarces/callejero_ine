@@ -166,10 +166,10 @@ def get_poblaciones_by_cpro(
     # TODO Eliminar el nucleo de poblacion directamente de la fuente de datos
     cur = con.execute(
         """
-        SELECT cmun, FLOOR(cun / 1000) AS cun, NENTSIC
+        SELECT cmun, FLOOR(cun_var / 1000) AS cun, NENTSIC
         FROM TRAM
         WHERE cpro = ?
-        GROUP BY cmun, FLOOR(cun / 1000), NENTSIC
+        GROUP BY cmun, FLOOR(cun_var / 1000), NENTSIC
         ORDER BY cmun, cun
     """,
         [cpro],
@@ -215,20 +215,22 @@ def get_poblaciones_by_cp(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     sql = """
-        SELECT cpos, cpro, cmun, FLOOR(cun / 1000), NENTSIC
+        SELECT cpos, cpro, cmun, FLOOR(cun_var / 1000) as cun, NENTSIC
         FROM TRAM
     """
 
     cur = None
     if len(cpos) == 5:
-        sql += "WHERE cpos = ?  GROUP BY cpos, cpro, cmun, FLOOR(cun / 1000), NENTSIC "
+        sql += (
+            "WHERE cpos = ?  GROUP BY cpos, cpro, cmun, FLOOR(cun_var / 1000), NENTSIC "
+        )
         cur = con.execute(sql, [int(cpos)])
     else:
         # Se completa con valores a la derecha para busquedas parciales, respetando los ceros a la izquierda
         cpos_min = int(cpos.ljust(5, "0"))
         cpos_max = int(cpos.ljust(5, "9"))
 
-        sql += "WHERE cpos BETWEEN ? and ? GROUP BY cpos, cpro, cmun, FLOOR(cun / 1000), NENTSIC"
+        sql += "WHERE cpos BETWEEN ? and ? GROUP BY cpos, cpro, cmun, FLOOR(cun_var / 1000), NENTSIC"
         cur = con.execute(sql, [cpos_min, cpos_max])
 
     rows = cur.fetchall()
@@ -319,11 +321,11 @@ def get_via_by_cun(
 
     cur = con.execute(
         """
-        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun, NENTSIC, TVIA, TRAM.nviac
+        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun_var as cun, NENTSIC, TVIA, TRAM.nviac
         FROM TRAM
         INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia = VIAS.cvia
-        WHERE TRAM.cpro = ? and TRAM.cmun = ? and TRAM.cun = ? and TRAM.nviac LIKE ?
-        GROUP BY  cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun, NENTSIC, TVIA, TRAM.nviac
+        WHERE TRAM.cpro = ? and TRAM.cmun = ? and TRAM.cun_var = ? and TRAM.nviac LIKE ?
+        GROUP BY  cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun_var, NENTSIC, TVIA, TRAM.nviac
     """,
         [cpro, cmun, cun, f"%{nviac.upper()}%"],
     )

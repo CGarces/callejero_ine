@@ -358,9 +358,6 @@ def test_get_localidades_by_cpro_cmun_not_found():
 
 def test_get_by_cun_valid():
     """Prueba que devuelve información para una unidad poblacional específica"""
-    # NOTA: Este endpoint tiene un error en la base de datos (cun_var no existe)
-    # Se marca como skip hasta que se corrija el endpoint
-    pytest.skip("Endpoint con error en base de datos: campo cun_var no existe")
     # Madrid capital: cpro=28, cmun=79, cun=1000 (primer tramo)
     response = client.get("/api/cp/28/79/1000")
     assert response.status_code in [200, 404]
@@ -404,9 +401,6 @@ def test_get_by_cun_negative_cun():
 
 def test_get_by_cun_not_found():
     """Prueba que devuelve 404 para unidad poblacional inexistente"""
-    # NOTA: Este endpoint tiene un error en la base de datos (cun_var no existe)
-    # Se marca como skip hasta que se corrija el endpoint
-    pytest.skip("Endpoint con error en base de datos: campo cun_var no existe")
     response = client.get("/api/cp/28/79/99999")
     assert response.status_code == 404
     assert "Sin resultados" in response.json()["detail"]
