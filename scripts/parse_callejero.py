@@ -12,6 +12,7 @@ Dependencias: pandas, pyarrow, duckdb, urllib3
 import pathlib
 import os
 from typing import Iterable, List, Dict, Tuple
+import time
 
 import pandas as pd
 import duckdb
@@ -230,7 +231,6 @@ PARSERS = {
 
 
 def main():
-    output_dir = pathlib.Path("output")
     input_dir = pathlib.Path("input")
 
     con = duckdb.connect()
@@ -238,6 +238,7 @@ def main():
     if os.path.exists("callejero.duckdb"):
         os.remove("callejero.duckdb")
     con.execute("ATTACH 'callejero.duckdb'")
+    start = time.perf_counter()
 
     for stem, func in PARSERS.items():
         files = sorted(input_dir.glob(f"caj_esp_??????/{stem}*.*"))
@@ -252,14 +253,16 @@ def main():
         print(f"[INFO] Procesando {path.name} -> Parquet")
         df = func(path, None)
         df = df.drop_duplicates()
-        out_path = output_dir / f"{path.stem.split(".", 1)[0]}.parquet"
-        df.to_parquet(out_path, index=False, engine="pyarrow", compression="gzip")
-        print(f"[OK] {out_path} ({len(df)} filas)")
+        print(f"[OK] {stem} ({len(df)} filas)")
         # Carga en DuckDB
-        con.execute(f"CREATE TABLE {stem} AS SELECT * FROM read_parquet('{out_path}')")
+        con.execute(f"CREATE TABLE {stem} AS SELECT * FROM df")
 
     con.execute("COPY FROM DATABASE memory TO callejero")
     con.execute("DETACH callejero")
+    end = time.perf_counter()
+    print(
+        f"[INFO] Base de datos 'callejero.duckdb' creada en {end - start:.2f} segundos"
+    )
 
 
 if __name__ == "__main__":
