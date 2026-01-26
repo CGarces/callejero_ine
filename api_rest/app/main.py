@@ -266,11 +266,11 @@ def get_via_by_cpos(
 
     cur = con.execute(
         """
-        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, TRAM.nviac
+        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia_var as cvia, NENTSIC, TVIA, TRAM.nviac
         FROM TRAM
-        INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia = VIAS.cvia
+        INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia_var = VIAS.cvia_var
         WHERE cpos = ? and TRAM.nviac LIKE ?
-        GROUP BY cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, NENTSIC, TVIA, TRAM.nviac
+        GROUP BY cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia_var, NENTSIC, TVIA, TRAM.nviac
     """,
         [cpos, f"%{nviac.upper()}%"],
     )
@@ -321,11 +321,11 @@ def get_via_by_cun(
 
     cur = con.execute(
         """
-        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun_var as cun, NENTSIC, TVIA, TRAM.nviac
+        SELECT cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia_var as cvia, TRAM.cun_var as cun, NENTSIC, TVIA, TRAM.nviac
         FROM TRAM
-        INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia = VIAS.cvia
+        INNER JOIN VIAS ON TRAM.cpro = VIAS.cpro AND TRAM.cmun = VIAS.cmun AND TRAM.cvia_var = VIAS.cvia_var
         WHERE TRAM.cpro = ? and TRAM.cmun = ? and TRAM.cun_var = ? and TRAM.nviac LIKE ?
-        GROUP BY  cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia, TRAM.cun_var, NENTSIC, TVIA, TRAM.nviac
+        GROUP BY  cpos, TRAM.cpro, TRAM.cmun, TRAM.cvia_var, TRAM.cun_var, NENTSIC, TVIA, TRAM.nviac
     """,
         [cpro, cmun, cun, f"%{nviac.upper()}%"],
     )
