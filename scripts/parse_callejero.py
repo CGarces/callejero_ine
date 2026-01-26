@@ -310,8 +310,10 @@ def main():
         table = path.stem.split(".", 1)[0]
         if table not in ["VIAS", "TRAM"]:
             print(f"[INFO] Saltando {path.name} (no se carga en BBDD final)")
+            continue
         print(f"[INFO] Procesando {path.name} -> Parquet")
         df = func(path, None)
+        df = df.drop_duplicates()
         out_path = output_dir / f"{path.stem.split(".", 1)[0]}.parquet"
         df.to_parquet(out_path, index=False, engine="pyarrow", compression="gzip")
         print(f"[OK] {out_path} ({len(df)} filas)")
