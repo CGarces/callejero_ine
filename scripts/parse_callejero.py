@@ -24,6 +24,7 @@ DTYPE_MAP = {
     "Int16": pd.Int16Dtype(),
     "Int32": pd.Int32Dtype(),
     "Int64": pd.Int64Dtype(),
+    "category": pd.CategoricalDtype(),
 }
 
 # ---------------------------------------------------------------------------
@@ -56,7 +57,7 @@ VIAS_SPEC: List[FieldSpec] = [
     # ("fvar", 38, 46, "Int32"),
     # ("cvar", 46, 47, "string"),
     ("cvia_var", 47, 52, "Int32"),
-    ("tvia", 52, 57, "string"),
+    ("tvia", 52, 57, "category"),
     # ("nvia", 57, 107, "string"),
     # ("nviac", 107, 132, "string"),
     # ("vector", 132, 152, "string"),
