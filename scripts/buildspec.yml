@@ -1,0 +1,13 @@
+version: 0.2
+env:
+  variables:
+    IMAGE_TAG: latest
+phases:
+  pre_build:
+    commands:
+      - echo Installing dependencies...
+      - pip install -r scripts/requirements.txt
+  build:
+    commands:
+      - echo Actualizando base de datos callejero.duckdb...
+      - python donwload_callejero.py
