@@ -10,4 +10,4 @@ phases:
   build:
     commands:
       - echo Actualizando base de datos callejero.duckdb...
-      - python donwload_callejero.py
+      - python scripts/download_callejero.py
