@@ -118,7 +118,7 @@ Para ejecutar el proyecto en local, es necesario tener instalado previamente pyt
 4. Ejecuta los scripts de procesamiento de datos para generar la base de datos DuckDB:
 
    ```bash
-   python scripts/donwload_callejero.py
+   python scripts/download_callejero.py
    python scripts/parse_callejero.py
    ```
 
